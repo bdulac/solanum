@@ -17,6 +17,7 @@ import javax.persistence.SharedCacheMode;
 import javax.persistence.ValidationMode;
 import javax.persistence.spi.ClassTransformer;
 import javax.persistence.spi.PersistenceProvider;
+import javax.persistence.spi.PersistenceUnitInfo;
 import javax.persistence.spi.PersistenceUnitTransactionType;
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
@@ -33,14 +34,13 @@ import org.xml.sax.SAXException;
  * Implementation of the persistence unit informations for Solr
  * @see fr.mnhn.persistence.spi.PersistenceProvider
  */
-public class PersistenceUnitInfo 
-implements javax.persistence.spi.PersistenceUnitInfo {
+public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	
 	public static final String metadataUnitProperty = 
 			"metadata.persistence-unit";
 	
 	private static final Logger logger = 
-			Logger.getLogger(PersistenceUnitInfo.class.getName());
+			Logger.getLogger(PersistenceUnitInfoImpl.class.getName());
 	
 	/**
 	 * Lists the persistence unit names in the {@code META-INF/persistence.xml} file loaded by 
@@ -116,7 +116,8 @@ implements javax.persistence.spi.PersistenceUnitInfo {
 					Element elm = (Element)n;
 					String name = elm.getAttribute("name");
 					if((name != null) && (name.equals(uName))) {
-						return getInstance(persistenceProvider, elm);
+						return getInstance(
+								persistenceProvider, elm);
 					}
 				}
 			}
@@ -132,10 +133,9 @@ implements javax.persistence.spi.PersistenceUnitInfo {
 		return null;
 	}
 	
-	private static PersistenceUnitInfo getInstance(
-			PersistenceProvider provider, 
-			Element puElement
-	) throws NamingException {
+	private static PersistenceUnitInfoImpl getInstance(
+			PersistenceProvider provider, Element puElement
+			) throws NamingException {
 		if(provider == null) {
 			throw new IllegalArgumentException(
 					"The persistence provider should not be null"
@@ -217,7 +217,9 @@ implements javax.persistence.spi.PersistenceUnitInfo {
 				properties.put(propertyName, propertyValue);
 			}
 		}
-		return new PersistenceUnitInfo(uName, provider, ds, properties, classes);
+		return 
+				new PersistenceUnitInfoImpl(
+						uName, provider, ds, properties, classes);
 	}
 	
 	/**
@@ -253,7 +255,7 @@ implements javax.persistence.spi.PersistenceUnitInfo {
 	
 	private List<Class<?>> managedClasses;
 	
-	public PersistenceUnitInfo(
+	public PersistenceUnitInfoImpl(
 			final String uName, 
 			final PersistenceProvider provider, 
 			DataSource dataSource, 
@@ -261,13 +263,13 @@ implements javax.persistence.spi.PersistenceUnitInfo {
 			List<Class<?>> entityClasses
 	) {
 		if(uName == null) {
-			throw new IllegalArgumentException(
-					"The persistent unit should have a name"
+			throw new NullPointerException(
+					"The persistent unit name can not be null"
 			);
 		}
 		if(provider == null) {
-			throw new IllegalArgumentException(
-					"The persistent unit should have a persistence provider"
+			throw new NullPointerException(
+					"The persistent provider can not be null"
 			);
 		}
 		persistenceUnitName = uName;
