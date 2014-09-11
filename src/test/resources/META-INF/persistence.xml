@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence>
     <persistence-unit name="OrderManagement">
+    	<provider>solanum.persistence.spi.PersistenceProvider</provider>
         <description>This unit manages orders and customers.
             It does not rely on any vendor-specific features and can
             therefore be deployed to any persistence provider.
