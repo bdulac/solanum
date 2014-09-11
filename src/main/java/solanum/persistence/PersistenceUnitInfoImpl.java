@@ -156,8 +156,9 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 				Element providerElement = (Element)node;
 				String providerClassName = 
 						providerElement.getTextContent();
-				// Si nous n'avons pas le bon PersistenceProvider
+				// If we have the right provider, 
 				if(provider.getClass().getName().equals(providerClassName)) {
+					// Then that's fine
 					providerOk = true;
 					break;
 				}
@@ -172,7 +173,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 			);
 		}
 		DataSource ds = null;
-		// The data source .? 
+		// The data source and Solr .? 
 		NodeList datasourceNodes = 
 				puElement.getElementsByTagName("non-jta-data-source");
 		for(int i = 0 ; i < datasourceNodes.getLength() ; i++) {
