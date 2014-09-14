@@ -1,4 +1,5 @@
 import solanum.persistence.EntityManagerFactoryTestCase;
+import solanum.persistence.EntityManagerTestCase;
 import solanum.persistence.PersistenceUnitInfoTestCase;
 import solanum.persistence.spi.PersistenceProviderTestCase;
 import junit.framework.Test;
@@ -12,6 +13,7 @@ public class SolanumTestSuite {
 		suite.addTestSuite(PersistenceProviderTestCase.class);
 		suite.addTestSuite(PersistenceUnitInfoTestCase.class);
 		suite.addTestSuite(EntityManagerFactoryTestCase.class);
+		suite.addTestSuite(EntityManagerTestCase.class);
 		return suite;
 	}
 

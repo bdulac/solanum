@@ -1,6 +1,8 @@
 package solanum.persistence;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Cache;
@@ -11,11 +13,20 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.metamodel.Metamodel;
 import javax.persistence.spi.PersistenceUnitInfo;
 
+/** Implementation of an entity manager factory */
 public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	
+	/** Info about the persistence unit associated to the EMF */
 	private PersistenceUnitInfo unitInfo;
 	
-	Map<Object, Object> properties;
+	/** Properties associated to the creation of the EMF */
+	private Map<String, Object> properties;
+	
+	/** List of created and open entity managers */
+	private List<EntityManager> entityManagers;
+	
+	/** Flag : is EMF open */
+	private boolean open;
 	
 	public EntityManagerFactoryImpl(
 			PersistenceUnitInfo uInfo, Map<Object, Object> p) {
@@ -23,26 +34,47 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 				"The persistence unit info should not be null"
 		);
 		unitInfo = uInfo;
-		if(p != null)properties = p;
-		else properties = new HashMap<Object, Object>();
+		properties = new HashMap<String, Object>();
+		if(p != null) {
+			for(Object k : p.keySet()) {
+				if(k != null) {
+					Object v = p.get(k);
+					properties.put(k.toString(), v);
+				}
+			}
+		}
+		entityManagers = new ArrayList<EntityManager>();
+		open = true;
+	}
+	
+	public PersistenceUnitInfo getPersistenceUnitInfo() {
+		return unitInfo;
 	}
 
 	@Override
 	public void close() {
-		// TODO Auto-generated method stub
-		
+		for(EntityManager em : entityManagers) {
+			em.clear();
+			em.close();
+		}
+		entityManagers.clear();
+		open = false;
 	}
 
 	@Override
 	public EntityManager createEntityManager() {
-		// TODO Auto-generated method stub
-		return null;
+		EntityManager em = new EntityManagerImpl(this, null);
+		entityManagers.add(em);
+		return em;
 	}
 
 	@Override
-	public EntityManager createEntityManager(Map arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public EntityManager createEntityManager(
+			@SuppressWarnings("rawtypes") Map p) {
+		@SuppressWarnings("unchecked")
+		EntityManager em = new EntityManagerImpl(this, p);
+		entityManagers.add(em);
+		return em;
 	}
 
 	@Override
@@ -71,14 +103,12 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
 	@Override
 	public Map<String, Object> getProperties() {
-		// TODO Auto-generated method stub
-		return null;
+		return properties;
 	}
 
 	@Override
 	public boolean isOpen() {
-		// TODO Auto-generated method stub
-		return false;
+		return open;
 	}
 
 }
