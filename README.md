@@ -1,4 +1,4 @@
-solanum
+*Solanum*
 =======
 
-A JPA implementation for Apache Solr
+A basic draft JPA implementation for Apache Solr.
